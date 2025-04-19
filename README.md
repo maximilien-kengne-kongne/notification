@@ -28,6 +28,12 @@ The idea behind this service emerged from a recurring need in enterprise applica
 
 ---
 
+## Technologies
+
+- Java 21
+- Spring Boot : 3.4.4
+
+
 ## Getting Started
 
 To use this starter you will need to add the following dependency to your project.
@@ -39,6 +45,34 @@ To use this starter you will need to add the following dependency to your projec
     <version>1.0.0</version>
 </dependency>
 ```
+
+## Note
+Don't add again these dependencies in your project
+
+``` xml
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+```
+
 ---
 ## Configuration
 
@@ -175,33 +209,6 @@ The scenarios tested include :
 - error handling 
 
 ---
-
-## Note
- Don't add again these dependencies in your project
-
-``` xml
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-```
 
 ## 👨‍💻 Author
 
