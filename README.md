@@ -45,7 +45,7 @@ To use this starter you will need to add the following dependency to your projec
 <dependency>
     <groupId>dev.kkm</groupId>
     <artifactId>notification-spring-boot-starter </artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
