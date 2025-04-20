@@ -30,11 +30,11 @@ public class CourierConfig {
         mailSender.setPort(properties.getPort() != null?properties.getPort():25);
         mailSender.setUsername(properties.getUsername());
         mailSender.setPassword(properties.getPassword());
+        mailSender.setDefaultEncoding(properties.getDefaultEncoding() != null? String.valueOf(properties.getDefaultEncoding()) : "UTF-8");
 
         Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+        props.putAll(properties.getProperties());
+        mailSender.setJavaMailProperties(props);
 
         return mailSender;
     }

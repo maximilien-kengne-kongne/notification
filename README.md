@@ -23,6 +23,8 @@ The idea behind this service emerged from a recurring need in enterprise applica
 - ✅ Send HTML emails via **Thymeleaf templates**
 - ✅ Attach one or more **file attachments**
 - ✅ Support for `To`, `CC`, and `BCC` recipients
+- ✅ Support replyTo
+- ✅ Support priority
 - ✅ Customize sender name via organization field
 - ✅ Easy integration into any Spring application
 
@@ -32,6 +34,7 @@ The idea behind this service emerged from a recurring need in enterprise applica
 
 - Java 21
 - Spring Boot : 3.4.4
+- Maven
 
 
 ## Getting Started
@@ -65,11 +68,7 @@ Don't add again these dependencies in your project
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+
 	</dependencies>
 ```
 
@@ -96,39 +95,96 @@ private CourierService courierService;
 
 ## How to use ?
 
-### 1. Send basic email
-
+### 1. Send basic email 
+These base parameter are mandatory for any combination
 ``` java
-CourierDetail courierDetail = CourierDetail.builder()
-.withSender("noreply@company.com")
-.addRecipient("client@example.com")
-.withSubject("Your Order Confirmation")
-.withBody("Thank you for your order!")
-.build();
+        try {
 
- courierService.sendCourier(courierDetail);
+            CourierDetail courierDetail = CourierDetail.builder()
+                    .withSender("noreply@company.com")
+                    .addRecipient("client@example.com")
+                    .withSubject("Your Order Confirmation")
+                    .withBody("Thank you for your order!")
+                    .withOrganizationName("Organization")
+                    .build();
 
+            courierService.sendCourier(courierDetail);
+
+        } catch (CourierException courierException) {
+            switch (courierException.getStatus()) {
+                case 901 -> {
+                    // something went wrong during sending email (pending mode)
+                }
+                case 902 -> {
+                    // mail not send (pending mode)
+                   
+                }
+                case 903 -> {
+                    // invalid email address (canceling mode)
+                }
+                case 904 -> {
+                    // unsupported encoding (canceling mode)
+                }
+                
+                case 905 -> {
+                    // probably template not found (canceling mode)
+                }
+                default -> {
+                   // invalid or required field (canceling mode)
+                }
+            }
+        }
 ```
 
 ### 2. Send basic email with attachment
 
 ``` java
-DataSource attachment = new FileDataSource("invoice.pdf");
+try {
+            byte[] data = new byte[0];
+            DataSource attachment  = new ByteArrayDataSource(data, "application/pdf");
 
-CourierDetail courierDetail = CourierDetail.builder()
-    .withSender("billing@company.com")
-    .addRecipient("accounting@example.com")
-    .withSubject("Monthly Invoice")
-    .withBody("Please find attached the monthly invoice.")
-    .addAttachment("invoice-january.pdf", attachment)
-    .build();
-    
-     courierService.sendCourier(courierDetail);
+            CourierDetail courierDetail1 = CourierDetail.builder()
+                    .withSender("noreply@company.com")
+                    .addRecipient("client@example.com")
+                    .withSubject("Your Order Confirmation")
+                    .withBody("Thank you for your order!")
+                    .withOrganizationName("Organization")
+                    .addAttachment("order-confirmation", attachment )
+                    .build();
+
+            courierService.sendCourier(courierDetail);
+
+        } catch (CourierException courierException) {
+            switch (courierException.getStatus()) {
+                case 901 -> {
+                    // something went wrong during sending email (pending mode)
+                }
+                case 902 -> {
+                    // mail not send (pending mode)
+                   
+                }
+                case 903 -> {
+                    // invalid email address (canceling mode)
+                }
+                case 904 -> {
+                    // unsupported encoding (canceling mode)
+                }
+                
+                case 905 -> {
+                    // probably template not found (canceling mode)
+                }
+                default -> {
+                   // invalid or required field (canceling mode)
+                }
+            }
+        }
 ```
 
 ### 3. Send courier with template
 
 ``` java
+ try {
+ 
 Map<String, Object> variables = new HashMap<>();
 variables.put("name", "John Doe");
 variables.put("orderNumber", "12345");
@@ -137,41 +193,98 @@ CourierDetail courierDetail = CourierDetail.builder()
     .withSender("orders@company.com")
     .addRecipient("john.doe@example.com")
     .withSubject("Order #12345 Confirmation")
+    .withOrganizationName("Organization")
     .withTemplate("order-confirmation")
     .addVariables(variables)
     .build();
     
-     courierService.sendCourier(courierDetail);
+        courierService.sendCourier(courierDetail);
+        
+        } catch (CourierException courierException) {
+            switch (courierException.getStatus()) {
+                case 901 -> {
+                    // something went wrong during sending email (pending mode)
+                }
+                case 902 -> {
+                    // mail not send (pending mode)
+                   
+                }
+                case 903 -> {
+                    // invalid email address (canceling mode)
+                }
+                case 904 -> {
+                    // unsupported encoding (canceling mode)
+                }
+                
+                case 905 -> {
+                    // probably template not found (canceling mode)
+                }
+                default -> {
+                   // invalid or required field (canceling mode)
+                }
+            }
+        }     
 ```
 ### 4. Send courier with template and with attachment
 
 ``` java
+
+        try {
 Map<String, Object> variables = new HashMap<>();
 variables.put("name", "John Doe");
 variables.put("orderNumber", "12345");
 
-DataSource attachment = new FileDataSource("invoice.pdf");
+byte[] data = new byte[0];
+DataSource attachment = new ByteArrayDataSource(data, "application/pdf");
 
 CourierDetail courierDetail = CourierDetail.builder()
     .withSender("orders@company.com")
     .addRecipient("john.doe@example.com")
     .withSubject("Order #12345 Confirmation")
     .withTemplate("order-confirmation")
+    .withOrganizationName("Organization")
     .addVariables(variables)
-    .addAttachment("invoice-january.pdf", attachment)
+    .addAttachment("invoice-january", attachment)
     .build();
     
      courierService.sendCourier(courierDetail);
+     
+         } catch (CourierException courierException) {
+            switch (courierException.getStatus()) {
+                case 901 -> {
+                    // something went wrong during sending email (pending mode)
+                }
+                case 902 -> {
+                    // mail not send (pending mode)
+                   
+                }
+                case 903 -> {
+                    // invalid email address (canceling mode)
+                }
+                case 904 -> {
+                    // unsupported encoding (canceling mode)
+                }
+                
+                case 905 -> {
+                    // probably template not found (canceling mode)
+                }
+                default -> {
+                   // invalid or required field (canceling mode)
+                }
+            }
+        }    
 ```
 
 ### 5. Send email with all details of courier 
 
 ``` java
+        try {
 Map<String, Object> variables = new HashMap<>();
 variables.put("name", "John Doe");
 variables.put("orderNumber", "12345");
 
-DataSource attachment = new FileDataSource("invoice.pdf");
+byte[] data = new byte[0];
+DataSource attachment = new ByteArrayDataSource(data, "application/pdf");
 
 CourierDetail courierDetail = CourierDetail.builder()
     .withSender("orders@company.com")
@@ -182,10 +295,47 @@ CourierDetail courierDetail = CourierDetail.builder()
     .withTemplate("order-confirmation")
     .withOrganizationName("BE-SHOP")
     .addVariables(variables)
-    .addAttachment("invoice-january.pdf", attachment)
+    .addAttachment("invoice-january", attachment)
     .build();
     
     courierService.sendCourier(courierDetail);
+    
+        } catch (CourierException courierException) {
+            switch (courierException.getStatus()) {
+                case 901 -> {
+                    // something went wrong during sending email (pending mode)
+                }
+                case 902 -> {
+                    // mail not send (pending mode)
+                   
+                }
+                case 903 -> {
+                    // invalid email address (canceling mode)
+                }
+                case 904 -> {
+                    // unsupported encoding (canceling mode)
+                }
+                
+                case 905 -> {
+                    // probably template not found (canceling mode)
+                }
+                default -> {
+                   // invalid or required field (canceling mode)
+                }
+            }
+        }    
+```
+
+## Status code explanation
+
+``` json5
+900 : invalid or required field
+901 : something went wrong during sending email
+902 : mail not send
+903 : invalid email address
+904 : unsupported encoding
+905 : probably template not found
+
 ```
 
 ---
@@ -208,6 +358,8 @@ The scenarios tested include :
 - Email validation
 - error handling 
 
+## ⏭️ To do
+ - send sms notification
 ---
 
 ## 👨‍💻 Author

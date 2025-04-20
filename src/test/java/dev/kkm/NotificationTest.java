@@ -60,6 +60,7 @@ class NotificationTest {
                 .addRecipient("client@example.com")
                 .withSubject("Your Order Confirmation")
                 .withBody("Thank you for your order!")
+                .withOrganizationName("Organization")
                 .build();
 
         courierService.sendCourier(courierDetail);
@@ -96,6 +97,7 @@ class NotificationTest {
                 .addRecipient("client@example.com")
                 .withSubject("Your Order Confirmation")
                 .withBody("Thank you for your order!")
+                .withOrganizationName("Organization")
                 .addAttachment("file.html", mockAttachment)
                 .build();
 
@@ -111,6 +113,7 @@ class NotificationTest {
                 .addRecipient("client1@example.com")
                 .withSubject("Subject 1")
                 .withBody("Body 1")
+                .withOrganizationName("Organization")
                 .build();
 
         CourierDetail email2 = CourierDetail.builder()
@@ -118,6 +121,7 @@ class NotificationTest {
                 .addRecipient("client2@example.com")
                 .withSubject("Subject 2")
                 .withBody("Body 2")
+                .withOrganizationName("Organization")
                 .build();
 
         List<CourierDetail> courierDetails = Arrays.asList(email1, email2);
@@ -138,6 +142,7 @@ class NotificationTest {
                 .addRecipient("client@example.com")
                 .withSubject("Your Order Confirmation")
                 .withBody("Thank you for your order!")
+                .withOrganizationName("Organization")
                 .build();
 
         // Act
@@ -158,6 +163,7 @@ class NotificationTest {
                 .withSender("noreply@company.com")
                 .addRecipient("client@example.com")
                 .withSubject("Order Confirmation")
+                .withOrganizationName("Organization")
                 .withTemplate("order-confirmation")
                 .addVariables(variables)
                 .build();
@@ -181,6 +187,7 @@ class NotificationTest {
                 .addRecipient("client@example.com")
                 .withSubject("Test Subject")
                 .withBody("Test Body")
+                .withOrganizationName("Organization")
                 .build();
 
         // Act & Assert
@@ -201,6 +208,7 @@ class NotificationTest {
                 .withSender("noreply@company.com")
                 .addRecipient("client@example.com")
                 .withSubject("Test Subject")
+                .withOrganizationName("Organization")
                 .addVariables(variables)
                 .withTemplate("non-existent-template")
                 .build();
@@ -210,10 +218,12 @@ class NotificationTest {
                 .thenThrow(new RuntimeException("Template not found"));
 
         // Act & Assert
-        CourierException exception = assertThrows(CourierException.class, () -> courierService.sendCourier(courierDetail));
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> courierService.sendCourier(courierDetail));
 
         assertEquals("Template not found", exception.getMessage());
         verify(applicationContext.getBean(JavaMailSenderImpl.class), never()).send(any(MimeMessage.class));
+
+
     }
 
 

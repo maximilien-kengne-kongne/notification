@@ -21,6 +21,14 @@ public class CourierDetail {
     private final String body;
     private final String organizationName;
     private final String templateName;
+    /**
+     * possibles values 1,3,5 <br/>
+     * 1: high
+     * 3: normal
+     * 5: low
+     */
+    private final Integer priority;
+    private final String replyTo;
     private final Map<String, Object> variables;
     private final Map<String, DataSource> attachments;
 
@@ -56,6 +64,14 @@ public class CourierDetail {
         return templateName;
     }
 
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public String getReplyTo() {
+        return replyTo;
+    }
+
     public Map<String, Object> getVariables() {
         return variables;
     }
@@ -73,6 +89,8 @@ public class CourierDetail {
         this.body = builder.body;
         this.organizationName = builder.organizationName;
         this.templateName = builder.templateName;
+        this.priority = builder.priority;
+        this.replyTo = builder.replyTo;
         this.variables = Map.copyOf(builder.variables);
         this.attachments = Map.copyOf(builder.attachments);
     }
@@ -91,6 +109,8 @@ public class CourierDetail {
         private String body;
         private String organizationName;
         private String templateName;
+        private Integer priority;
+        private String replyTo;
         private final Map<String, Object> variables = new HashMap<>();
         private final Map<String, DataSource> attachments = new HashMap<>();
 
@@ -137,18 +157,28 @@ public class CourierDetail {
         }
 
         public Builder withBody(String body) {
-            this.body = body;
+            this.body = Objects.requireNonNull(body, "Body cannot be null");
             return this;
         }
 
 
         public Builder withOrganizationName(String organizationName) {
-            this.organizationName = organizationName;
+            this.organizationName = Objects.requireNonNull(organizationName, "Organization name cannot be null");
             return this;
         }
 
         public Builder withTemplate(String templateName) {
             this.templateName = Objects.requireNonNull(templateName, "Template name cannot be null");
+            return this;
+        }
+
+        public Builder withPriority(Integer priority) {
+            this.priority = Objects.requireNonNull(priority, "Priority cannot be null");
+            return this;
+        }
+
+        public Builder withReplyTo(String replyTo) {
+            this.replyTo = Objects.requireNonNull(replyTo, "Reply TO cannot be null");
             return this;
         }
 
@@ -184,11 +214,11 @@ public class CourierDetail {
                 throw new CourierException("At least one recipient is required");
             }
 
-            if (sender == null || sender.isBlank()) {
+            if (sender.isBlank()) {
                 throw new CourierException("Sender is required");
             }
 
-            if (subject == null || subject.isBlank()) {
+            if (subject.isBlank()) {
                 throw new CourierException("Subject is required");
             }
 
@@ -202,6 +232,14 @@ public class CourierDetail {
 
             if (templateName != null && variables.isEmpty()) {
                 throw new CourierException("Variables are required when using a template");
+            }
+
+            if (priority != null && !List.of(1,3,5).contains(priority)) {
+                throw new CourierException("Priority must be in ( 1, 3, 5)");
+            }
+
+            if (organizationName == null) {
+                throw new CourierException("Organization name is required");
             }
 
             return new CourierDetail(this);

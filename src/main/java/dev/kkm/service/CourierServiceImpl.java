@@ -3,19 +3,19 @@ package dev.kkm.service;
 import dev.kkm.exception.CourierException;
 import dev.kkm.model.CourierDetail;
 import jakarta.activation.DataSource;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.context.ApplicationContext;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
 
 @Service
 public class CourierServiceImpl implements CourierService {
@@ -36,17 +36,11 @@ public class CourierServiceImpl implements CourierService {
             try {
                 MimeMessage message = applicationContext.getBean(JavaMailSenderImpl.class).createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+                helper.setSubject(courierDetail.getSubject());
                 helper.setSentDate(calendar.getTime());
+                helper.setFrom(new InternetAddress(courierDetail.getSender(), courierDetail.getOrganizationName()));
 
                 isValidEmail("sender", courierDetail.getSender());
-
-                if (courierDetail.getOrganizationName() != null) {
-                    helper.setFrom(new InternetAddress(courierDetail.getSender(), courierDetail.getOrganizationName()));
-                }else {
-                    helper.setFrom(courierDetail.getSender());
-                }
-
-                helper.setSubject(courierDetail.getSubject());
 
                 for (String recipient : courierDetail.getRecipients()) {
                     isValidEmail("recipient", recipient);
@@ -74,6 +68,15 @@ public class CourierServiceImpl implements CourierService {
                     helper.setText(courierDetail.getBody());
                 }
 
+                if (courierDetail.getPriority() != null) {
+                    helper.setPriority(courierDetail.getPriority());
+                }
+
+                if (courierDetail.getReplyTo() != null) {
+                    isValidEmail("replyTo", courierDetail.getReplyTo());
+                    helper.setReplyTo(courierDetail.getReplyTo());
+                }
+
                 if (courierDetail.getAttachments() != null) {
                     for (Map.Entry<String, DataSource> attachment : courierDetail.getAttachments().entrySet()) {
                         helper.addAttachment(attachment.getKey(), attachment.getValue());
@@ -81,8 +84,19 @@ public class CourierServiceImpl implements CourierService {
                 }
 
                 applicationContext.getBean(JavaMailSenderImpl.class).send(message);
-            } catch (Exception e) {
-                throw new CourierException(e.getMessage());
+
+            } catch (MessagingException messagingException) {
+                throw new CourierException(messagingException.getMessage(),901);
+            } catch (MailSendException mailSendException) {
+                if (!Objects.requireNonNull(mailSendException.getMessage()).contains("Invalid Addresses")) {
+                    throw new CourierException("mail not send",902);
+                } else {
+                    throw new CourierException("invalid email address", 903);
+                }
+            } catch (UnsupportedEncodingException unsupportedEncodingException) {
+                throw new CourierException(unsupportedEncodingException.getMessage(), 904);
+            }catch (RuntimeException runtimeException) {
+                throw new CourierException(runtimeException.getMessage(), 905);
             }
     }
 
