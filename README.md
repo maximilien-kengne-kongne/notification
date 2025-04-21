@@ -43,8 +43,8 @@ To use this starter you will need to add the following dependency to your projec
 
 ```xml
 <dependency>
-    <groupId>dev.kkm</groupId>
-    <artifactId>notification-spring-boot-starter </artifactId>
+    <groupId>io.github.maximilien-kengne-kongne</groupId>
+    <artifactId>notification-spring-boot-starter</artifactId>
     <version>1.0.1</version>
 </dependency>
 ```

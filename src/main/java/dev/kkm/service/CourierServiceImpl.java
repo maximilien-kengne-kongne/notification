@@ -6,6 +6,8 @@ import jakarta.activation.DataSource;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -22,6 +24,7 @@ public class CourierServiceImpl implements CourierService {
 
     private final ApplicationContext applicationContext;
     private final TemplateEngine templateEngine;
+    private static final Logger log = LoggerFactory.getLogger(CourierServiceImpl.class);
 
     public CourierServiceImpl( ApplicationContext applicationContext, TemplateEngine templateEngine) {
         this.applicationContext = applicationContext;
@@ -30,7 +33,7 @@ public class CourierServiceImpl implements CourierService {
 
     @Override
     public void sendCourier(CourierDetail courierDetail) {
-
+        log.info("... init sendCourier ...");
         Calendar calendar = Calendar.getInstance();
 
             try {
@@ -84,6 +87,8 @@ public class CourierServiceImpl implements CourierService {
                 }
 
                 applicationContext.getBean(JavaMailSenderImpl.class).send(message);
+
+                log.info("... Courier sent successfully ...");
 
             } catch (MessagingException messagingException) {
                 throw new CourierException(messagingException.getMessage(),901);
