@@ -10,7 +10,8 @@ import java.util.*;
 /**
  * this class content details of courier
  * @author  maximilien kengne kongne
- * @since   1.0
+ * @version  1.0.0
+ * @date 21/04/2025
  */
 public class CourierDetail {
     private final String sender;
@@ -30,6 +31,9 @@ public class CourierDetail {
     private final Integer priority;
     private final String replyTo;
     private final Map<String, Object> variables;
+    /**
+     * {@link jakarta.activation.DataSource}
+     */
     private final Map<String, DataSource> attachments;
 
     public String getSender() {

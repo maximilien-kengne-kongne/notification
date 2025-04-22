@@ -10,7 +10,7 @@ The idea behind this service emerged from a recurring need in enterprise applica
 
 - To **centralize email sending logic** instead of rewriting it in every project.
 - To **send HTML emails** based on dynamic **Thymeleaf templates**.
-- To **handle complex use cases** like attachments, CC/BCC fields, and embedded images.
+- To **handle complex use cases** like attachments, CC/BCC fields,replyTo, priority and embedded images.
 - To **ensure quality via unit testing**, so behavior is stable and predictable.
 
 🎯 The goal is to provide a **modular, reusable, and testable** solution that fits seamlessly into modern Java architectures.
@@ -32,7 +32,7 @@ The idea behind this service emerged from a recurring need in enterprise applica
 
 ## Technologies
 
-- Java 21
+- Java 17+
 - Spring Boot : 3.4.4
 - Maven
 
@@ -45,7 +45,7 @@ To use this starter you will need to add the following dependency to your projec
 <dependency>
     <groupId>io.github.maximilien-kengne-kongne</groupId>
     <artifactId>notification-spring-boot-starter</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 
@@ -96,7 +96,9 @@ private CourierService courierService;
 ## How to use ?
 
 ### 1. Send basic email 
-These base parameter are mandatory for any combination
+These base parameter are mandatory for any combination. <br/>
+NB: If body mentioned don't mention template,
+in the same way as if the template is filled in, no longer fill in the body.
 ``` java
         try {
 
